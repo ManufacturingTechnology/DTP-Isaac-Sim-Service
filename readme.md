@@ -11,4 +11,4 @@ methods, and ideas. This service is intended to aid in developing, running, and 
 
 ## Documentation
 
-Online documentation can be found [here](https://amt-dtp-iss.netlify.app/).
+Online documentation can be found at [https://iss.amt.onl/](https://iss.amt.onl/).
