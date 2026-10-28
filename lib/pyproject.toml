@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]  # 77: PEP 639 license expressions
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "amt-dtp-ise-lib"
+description = "AMT Digital Testbed Platform (DTP) Isaac Sim Python Library (ISPL)"
+readme = "readme.md"
+license = "Apache-2.0"
+# Copied in from the repo root by the makefile for the build (an editable install works without them)
+license-files = ["LICENSE.TXT", "NOTICE"]
+requires-python = ">=3.10"
+authors = [{ name = "AMT - The Association For Manufacturing Technology", email = "technology@amtonline.org" }]
+keywords = ["isaac-sim", "omniverse", "digital-twin", "simulation", "manufacturing", "robotics", "control-api"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+# If possible, the same library versions as Isaac Sim should be used
+# cd isaac-sim
+# python.bat -m pip list
+dependencies = [
+    "click==8.1.7",
+    "numpy", # "numpy==1.26.0", not compatible with newer python versions
+    "pydantic==2.11.7",
+    "requests==2.32.3",
+    
+]
+dynamic = ["version"] # For [tool.setuptools.dynamic] below
+
+[project.optional-dependencies]
+# Hosting the control APIs (amt.dtp.ise.lib.control.core.server, .segment.server). Clients don't need it.
+# Isaac Sim bundles these (fastapi 0.120.4, uvicorn 0.29.0 in Isaac Sim 6.0).
+server = [
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+]
+dev = [
+    "build",
+    "twine",
+    "pytest",
+    "pytest-cov",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "ruff",
+    "mypy",
+]
+
+[project.urls]
+Homepage = "https://iss.amt.onl/"
+Repository = "https://github.com/manufacturingtechnology/DTP-Isaac-Sim-Service/"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {file = "VERSION"} # Read from VERSION file
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.mypy]
+strict = true
+python_version = "3.10"
+
+[tool.pytest.ini_options]
+#testpaths = ["tests"]

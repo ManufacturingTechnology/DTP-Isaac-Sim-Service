@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]  # 77: PEP 639 license expressions
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "amt-dtp-iscp"
+description = "AMT Digital Testbed Platform (DTP) Isaac Sim Co-Processor (ISCP)"
+readme = "readme.md"
+license = "Apache-2.0"
+# Copied in from the repo root by the makefile for the build (an editable install works without them)
+license-files = ["LICENSE.TXT", "NOTICE"]
+# Isaac Sim 5.1.0 used Python 3.11.13
+requires-python = ">=3.11"
+authors = [{ name = "AMT - The Association For Manufacturing Technology", email = "technology@amtonline.org" }]
+keywords = ["isaac-sim", "digital-twin", "simulation", "manufacturing", "mesh-processing", "coprocessor"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+# manifold3d was 3.3.2 , having issues building package on windows during install
+dependencies = [
+    "click==8.1.7", # from ise lib  # From Isaac Sim
+    "pydantic==2.11.7", # "pydantic>=2.0",  # From Isaac Sim
+    "trimesh==4.11.2",
+    "manifold3d==3.4.1", # Needed for boolean operations in trimesh
+    "fastapi==0.133.0",
+    "uvicorn==0.41.0",
+    "scipy==1.17.1",
+    "networkx==3.6.1",
+    "scikit-image==0.26.0",
+    "requests==2.32.3", # "requests==2.32.5", # From Isaac Sim
+    "python-multipart",
+]
+dynamic = ["version"] # For [tool.setuptools.dynamic] below
+
+[project.scripts]
+amt-dtp-iscp = "amt.dtp.iscp.coprocessor:run"
+
+[project.optional-dependencies]
+# STEP (.step/.stp) import through trimesh. Opt-in: cascadio bundles OpenCASCADE, which is LGPL-2.1 (with an
+# exception), so it stays out of the default install and out of anything we ship (license check: ../makefile).
+step = [
+    "cascadio",
+]
+dev = [
+    "build",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "mypy",
+]
+
+[project.urls]
+Homepage = "https://iss.amt.onl/"
+Repository = "https://github.com/manufacturingtechnology/DTP-Isaac-Sim-Service/"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {file = "VERSION"} # Read from VERSION file
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.mypy]
+strict = true
+python_version = "3.11"
+
+[tool.pytest.ini_options]
+#testpaths = ["tests"]

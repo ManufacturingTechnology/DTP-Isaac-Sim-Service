@@ -1,0 +1,52 @@
+name: Build the ISS artifacts (Linux)
+description: >
+  The complete Linux build — `make` plus the assertion that every shipped
+  artifact actually landed in dist/. Shared verbatim by the PR gate (ci.yml) and
+  the release workflow (release.yml).
+
+# WHY THIS IS A COMPOSITE ACTION AND NOT TWO COPIES OF THE STEPS
+#     These steps used to be duplicated: four identical steps, 32 lines of YAML,
+#     in ci.yml's build-linux and release.yml's build-linux. Nothing kept them in
+#     step. Bump the Python version, add a system dependency, or change what
+#     counts as a complete dist/ in one file and forget the other, and the PR
+#     gate quietly stops testing what the release actually does — which is the
+#     one thing the gate exists to do.
+#
+#     So the build has exactly ONE definition, and both workflows call it. The
+#     action stops at "the artifacts exist and are sound"; everything
+#     release-SPECIFIC (uploading them, tagging, publishing) stays in
+#     release.yml. That split is deliberate: the part worth catching early is
+#     exactly the part shared here.
+#
+#     Referenced as `./.github/actions/build-linux`, which resolves to this repo
+#     at the commit under test — so the gate and the release can never run
+#     different versions of the build.
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v7
+      with:
+        python-version: '3.12'
+
+    - name: Build with make
+      shell: bash
+      run: make
+
+    - name: Verify build artifacts were produced
+      # `make` emits the final, version-stamped artifacts straight into dist/.
+      # Assert all three are there rather than trusting make's exit status: a
+      # sub-makefile that silently produces nothing still exits 0.
+      shell: bash
+      run: |
+        set -euo pipefail
+        shopt -s nullglob
+        ext=(dist/amt_dtp_ise-*.zip)
+        docs=(dist/amt_dtp_ise_docs-*.zip)
+        whl=(dist/*.whl)
+        fail=0
+        [ ${#ext[@]}  -gt 0 ] || { echo "::error::no dist/amt_dtp_ise-*.zip produced"; fail=1; }
+        [ ${#docs[@]} -gt 0 ] || { echo "::error::no dist/amt_dtp_ise_docs-*.zip produced"; fail=1; }
+        [ ${#whl[@]}  -gt 0 ] || { echo "::error::no dist/*.whl produced"; fail=1; }
+        echo "dist/ contents:"; ls -la dist/
+        exit $fail

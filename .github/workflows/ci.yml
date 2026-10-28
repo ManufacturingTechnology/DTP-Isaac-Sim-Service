@@ -1,0 +1,117 @@
+name: CI
+
+# Pre-merge build check. Runs on PRs into the protected staging/release branches
+# so a PR can't merge unless the project still builds on Linux (the only shipped
+# platform). Mark `build-linux`, `test` and `version-check` as required status
+# checks on these branches (see CONTRIBUTING.md → Branch protection rules).
+on:
+  pull_request:
+    branches: [main, 'dev/*', 'release/*']
+
+# A new push to the same PR cancels the in-flight run.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  version-check:
+    # Three guards, deliberately at three different scopes:
+    #   ALWAYS            — the version parses and is semver. Not
+    #                       release-specific: a malformed version breaks `make`,
+    #                       the dist/ artifact names, and the tag.
+    #   main, dev/*,      — the version is not one that has already been
+    #   release/*           released, so a released number can never be the
+    #                       current one on a protected branch. See GUARD 3.
+    #   release/* only    — the X.Y line matches the target branch.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate the version (and, on protected branches, that it can still ship)
+        run: |
+          # Reads + semver-validates in one place, shared with release.yml. Do
+          # NOT inline a parse here — two copies of a parse drift, and when they
+          # drift the git tag stops agreeing with the payload. See the script.
+          version=$(bash .github/scripts/read-version.sh) || exit 1
+          echo "OK: version '$version' is well-formed."
+
+          base="${{ github.base_ref }}"
+          tag="v$version"
+
+          # GUARD 2 (release PRs only) — the version's X.Y line matches the
+          # target branch, so the post-merge release workflow can't fail on a
+          # version/branch mismatch. Catches "merged the wrong PR into the wrong
+          # branch".
+          if [[ "$base" =~ ^release/([0-9]+)\.([0-9]+)$ ]]; then
+            expected_minor="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
+            actual_minor=$(echo "$version" | cut -d'-' -f1 | cut -d. -f1-2)
+            if [ "$expected_minor" != "$actual_minor" ]; then
+              echo "::error::PR targets '$base' which expects version $expected_minor.x, but version is '$version'"
+              exit 1
+            fi
+            echo "OK: version '$version' matches target branch '$base'."
+          fi
+
+          # GUARD 3 (main, dev/* AND release/*) — the version must not be released
+          # already. One check, two distinct failures it prevents:
+          #
+          #   release/* — merging IS how a release is made, so a PR whose
+          #               version is already tagged can only produce a run that
+          #               skips itself (release.yml sets should_release=false for
+          #               exactly this). A red PR now beats a silent no-op later.
+          #   main      — main stages the NEXT release. Letting it sit at a
+          #               version that already shipped means the stale number
+          #               rides the next forward-merge into release/*, where it
+          #               produces nothing. Refusing it at the door is what keeps
+          #               a released version from ever being current on main.
+          #
+          #   dev/X.Y   — dev/X.Y is the `main` of the X.Y patch line, so the
+          #               same argument applies one level down: a fix landing on
+          #               dev/1.0 while it still reads 1.0.0 would forward into
+          #               release/1.0 and release nothing.
+          #
+          # Only the FIRST PR after a release has to bump. Once the branch reads
+          # an unreleased version, later PRs onto it pass without bumping again —
+          # so several fixes accumulate under one pending number, which is what
+          # ships when the branch is forwarded.
+          #
+          # CONSEQUENCE: syncing a release branch with main WITHOUT releasing is
+          # no longer a single merge. That is the intended trade.
+          #
+          # Assign-then-test, never `git ls-remote ... | grep -q`: `set -e` must
+          # abort on a failed LOOKUP rather than let it read as "not released".
+          if [ "$base" = "main" ] || [[ "$base" =~ ^(dev|release)/ ]]; then
+            existing=$(git ls-remote --tags origin "refs/tags/$tag")
+            if [ -n "$existing" ]; then
+              echo "::error::$tag is already released (tagged on the remote), so it must not be the current version on '$base'. Bump the version in this PR — see CONTRIBUTING.md → Triggering a release."
+              exit 1
+            fi
+            echo "OK: $tag is not yet on the remote."
+          else
+            echo "Base branch '$base' is not a protected staging or release branch; skipping the release-state check."
+          fi
+
+  test:
+    # REQUIRED. `make test` builds the lib and co-processor wheels and runs
+    # lib/tests and coprocessor/tests against them in throwaway venvs; see the
+    # root makefile.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Run the test suite
+        run: make test
+
+  build-linux:
+    # The build is a SHARED composite action, identical to the one release.yml
+    # runs — see .github/actions/build-linux/action.yml for why. It ends having
+    # already asserted every dist/ artifact exists, so the gate needs nothing
+    # after it; only release.yml adds the upload.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/build-linux

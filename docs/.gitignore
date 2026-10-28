@@ -1,3 +1,6 @@
 dist/
 .venv/
+# The venv from before the per-OS names (ADR-0029; the root .gitignore has the current ones)
 venv/
+# Material privacy plugin's download cache
+.cache/

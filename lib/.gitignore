@@ -1,0 +1,17 @@
+.idea/
+
+.pytest_cache/
+__pycache__/
+VERSION
+
+dist/
+
+src/lib/
+src/**.egg-info
+
+# Venvs from before the per-OS names (ADR-0029; the root .gitignore has the current ones)
+venv/
+venv-test/
+# Copied from the repo root during a build
+/LICENSE.TXT
+/NOTICE

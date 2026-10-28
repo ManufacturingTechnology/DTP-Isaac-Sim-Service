@@ -1,0 +1,52 @@
+[package]
+version = "0.1.0-alpha.4"
+category = "Simulation"
+title = "AMT DTP Isaac Sim Extension"
+description = "AMT Digital Testbed Platform (DTP) Isaac Sim Extension (ISE): simulates manufacturing cells (machines, robots, workpieces) and controls them over web APIs. Apache-2.0; see LICENSE.TXT, NOTICE and THIRD-PARTY-NOTICES.md."
+authors = ["AMT - The Association For Manufacturing Technology"]
+repository = "https://github.com/manufacturingtechnology/DTP-Isaac-Sim-Service/"
+keywords = ["manufacturing", "digital twin", "testbed", "robot", "machine tool", "MTConnect", "control API"]
+readme = "readme.md"
+preview_image = "config/preview.png"
+icon = "config/icon.png"
+writeTarget.kit = true
+
+[dependencies]
+# Isaac Sim 6.0 experimental core APIs (migrated off the deprecated isaacsim.core.{api,prims,utils})
+"isaacsim.core.experimental.prims" = {}
+"isaacsim.core.experimental.materials" = {}
+"isaacsim.core.experimental.utils" = {}
+"isaacsim.core.simulation_manager" = {}  # World replacement (physics dt, sim state)
+"isaacsim.util.debug_draw" = {}
+"isaacsim.gui.components" = {}
+"omni.behavior.scripting.core" = {}  # BehaviorScript (was omni.kit.scripting in <=5.x)
+# RETAINED deprecated deps (no isaacsim.core.experimental.* equivalent in 6.0):
+"isaacsim.robot_motion.motion_generation" = {}  # LulaKinematicsSolver
+"isaacsim.robot_motion.cumotion" = {}  # cuMotion IK/FK (Lula successor): CuMotionKinematicsSolver, ManipulatorRobotCuMotionActuator
+"isaacsim.core.utils" = {}                       # viewports.set_camera_view
+"omni.usd" = {}
+"omni.kit.uiapp" = {}
+"omni.timeline" = {}
+"omni.physx" = {}
+"omni.graph.core" = {}
+"omni.kit.commands" = {}
+"omni.kit.actions.core" = {}
+"omni.kit.menu.utils" = {}
+"omni.kit.viewport.utility" = {}
+"omni.kit.viewport.window" = {}
+"omni.videoencoding" = {}  # NVENC mp4 encoding (video_encoding.get_video_encoding_interface)
+"omni.kit.asset_converter" = {}
+"omni.kit.tool.asset_exporter" = {}
+"omni.kit.menu.create" = {}
+"omni.kit.context_menu" = {}
+"omni.services.core" = {}
+"omni.services.transport.server.http" = {} # starts the HTTP server + mounts Swagger
+
+# Import prebundled modules before importing the amt.dtp.ise module
+[[python.module]]
+path = "pip_prebundle"
+
+[[python.module]]
+name = "amt.dtp.ise.extension"
+#path = "."
+

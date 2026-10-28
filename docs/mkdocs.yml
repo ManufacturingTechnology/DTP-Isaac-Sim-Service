@@ -1,5 +1,6 @@
 site_name: !ENV SITE_NAME
-site_url: "https://amt-dtp-ise.netlify.app/"
+site_url: "https://iss.amt.onl/"
+copyright: "Copyright &copy; AMT"
 docs_dir: src
 theme:
   name: material
@@ -9,30 +10,42 @@ theme:
     - navigation.instant
     - navigation.tracking
     - navigation.expanded
+#    - navigation.tabs
     - navigation.top
     - navigation.indexes
     - navigation.path
     - toc.follow
     - search.suggest
     - search.highlight
+#    - content.action.edit
+#    - content.action.view
     - content.code.annotate
     - content.code.copy
     - content.tooltips
   palette:
+#     - scheme: custom
+    # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
       toggle:
         icon: material/brightness-auto
         name: Switch to light mode
+
+    # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default 
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
+
+    # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       toggle:
         icon: material/brightness-4
         name: Switch to system preference
+
+
+# Admonitions
   icon:
     admonition:
       note: octicons/tag-16
@@ -50,66 +63,136 @@ theme:
 markdown_extensions:
   - toc:
       permalink: true
-      baselevel: 2
+      baselevel: 2 # Define which header level (##) to use as top level TOC. Default: 1
+
+  # Improves bold and italic handling
+  #   https://facelessuser.github.io/pymdown-extensions/extensions/betterem/
   - pymdownx.betterem:
       smart_enable: all
+
+  # Link related features
+  #   https://facelessuser.github.io/pymdown-extensions/extensions/magiclink/
   - pymdownx.magiclink:
       repo_url_shorthand: true
-      user: squidfunk
-      repo: mkdocs-material
+      user: manufacturingtechnology
+      repo: DTP-Isaac-Sim-Service
+
+  # For creating symbols such as copyright
+  #   https://facelessuser.github.io/pymdown-extensions/extensions/smartsymbols/
   - pymdownx.smartsymbols
+
+# Admonitions
   - admonition
   - pymdownx.details
   - pymdownx.superfences
+
+# Annotations
   - attr_list
   - md_in_html
   - pymdownx.superfences
+
+# Buttons
   - attr_list
+
+# Code Blocks
   - pymdownx.highlight:
       anchor_linenums: true
+#      linenums: true
   - pymdownx.inlinehilite
   - pymdownx.snippets:
       base_path: ..
       check_paths: true
   - pymdownx.superfences
+
+# Content Tabs
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
+
+# Data Tables
   - tables
+
+# Diagrams
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+
+# Footnotes
   - footnotes
+
+# Formatting
   - pymdownx.critic
   - pymdownx.caret
   - pymdownx.keys
   - pymdownx.mark
   - pymdownx.tilde
+
+# Grids
   - attr_list
   - md_in_html
+
+# Icons, Emojis
   - attr_list
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+# Images
   - attr_list
   - md_in_html
+
+# Lists
   - def_list
   - pymdownx.tasklist:
       custom_checkbox: true
+
+# MathJax
   - pymdownx.arithmatex:
       generic: true
+
+# Tooltips
   - abbr
   - attr_list
   - pymdownx.snippets
+
+
 extra_css:
   - stylesheets/extra.css
+
 plugins:
   - search
+  # Self-host everything the theme would otherwise load from third parties at view time (Google Fonts, the
+  # unpkg worker shim, Mermaid): downloaded at build time into assets/external/ (cache: .cache/, gitignored),
+  # so a page view contacts only this site. The bundled assets are listed in THIRD-PARTY-NOTICES.md.
+  - privacy
   - include_dir_to_nav:
+#      reverse_sort_directory: true
   - offline
   - include-markdown
+
 repo_url: https://github.com/manufacturingtechnology/DTP-Isaac-Sim-Service/
+
 nav:
   - index.md
+  - Getting Started: Getting Started
+  - Testbed Development: Testbed Development
+  - Asset Development: Asset Development
+  - Extension Development: Extension Development
+
+hooks:
+  - hooks/nav_merge.py
+  - hooks/exclude_theme_assets.py
+
+# The agent knowledge base (docs/src/Agents/) is excluded from the public build.
+# `make dev` uses mkdocs.dev.yml, which includes it. See docs/src/Agents/index.md.
+exclude_docs: |
+  Agents/
+
+# Report broken links and anchors as warnings (`mkdocs build --strict` makes them fatal).
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn

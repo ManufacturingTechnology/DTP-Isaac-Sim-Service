@@ -1,0 +1,11 @@
+{
+    "editor.rulers": [120],
+    "python.languageServer": "Pylance",
+    // One path only (Linux, ADR-0029); on Windows pick venv-windows once with "Python: Select Interpreter"
+    "python.defaultInterpreterPath": "venv-linux/bin/python3",
+    //"python.analysis.typeCheckingMode": "strict",
+    "python.analysis.autoSearchPaths": true,
+
+    "git.openRepositoryInParentFolders": "always",
+    "git.autoRepositoryDetection": true,
+}

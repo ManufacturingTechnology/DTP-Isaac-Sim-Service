@@ -21,15 +21,22 @@
   --header-color: #62a2db; /* AMT Light Blue */
 }
 
+/* Use the full page width (Material's theme caps .md-grid at max-width: 61rem) */
+.md-grid {
+  max-width: initial;
+}
+
+/* Keep the sidebars off the window edges (only where they're shown beside the content, not as a drawer) */
+@media screen and (min-width: 76.25em) {
+  .md-grid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
 /* Make the navigation menu title invisible */
 .md-nav__title {
   visibility: hidden;
-}
-
-/* Make the navigation menu full size, otherwise
-  scrollbar appears when not needed */
-.md-sidebar__scrollwrap {
-  height: 100%;
 }
 
 /* Set header colors */

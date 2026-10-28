@@ -1,0 +1,16 @@
+.idea/
+
+__pycache__/
+*.egg-info/
+dist/
+# Venvs from before the per-OS names (ADR-0029; the root .gitignore has the current ones)
+venv/
+venv-test/
+VERSION
+
+# Symbolic link (dev) or directory copied from ../lib (build)
+src/amt/dtp/iscp/lib
+src/amt/dtp/iscp/lib/
+# Copied from the repo root during a build
+/LICENSE.TXT
+/NOTICE

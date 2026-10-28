@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Python CoProcessor",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "src.amt.dtp.iscp.coprocessor",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            // The per-OS venvs (ADR-0029), set up by dev.bat (Windows) or `make dev` (Linux)
+            "windows": {
+                "python": "${workspaceFolder}/venv-windows/Scripts/python.exe",
+            },
+            "linux": {
+                "python": "${workspaceFolder}/venv-linux/bin/python",
+            },
+        }
+    ]
+}

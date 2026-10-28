@@ -1,0 +1,24 @@
+INHERIT: ./mkdocs.yml
+
+# The parent config excludes the whole Agents/ tree (that is the PUBLIC site). Here we
+# re-open it for local reading, then subtract the few pages written for agents
+# rather than people.
+exclude_docs: !!str ""
+
+# Include by default, exclude by exception -- far fewer pages need omitting than
+# including, so this is much less maintenance than listing the nav longhand.
+# Handled by hooks/nav_merge.py, which BOTH prunes these from the nav AND adds them
+# to exclude_docs so they are not built at all.
+#
+# Agents/Reference/* is `audience: agent` (dense, terse, optimized for the reader that
+# actually reads it); rendering it wastes build time and clutters the nav.
+# Everything else under Agents/ is `audience: both` and does get built.
+extra:
+  nav_exclude:
+    - Agents/Reference/
+
+  # Append Agent Docs to the end of the navigation menu. `Agents` is auto-expanded by the
+  # include_dir_to_nav plugin, so new folders under it need no change here.
+  nav_append:
+    __root__: # appended at the top level
+      - Agent Docs: Agents

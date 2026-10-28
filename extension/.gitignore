@@ -1,0 +1,26 @@
+__pycache__/
+.claude/
+/.vscode/settings.json
+
+# symlink to isaac sim application directory
+/isaac-sim
+
+# Output build files
+dist/
+
+# Created by install-spacemouse.sh
+exts/srl.spacemouse/
+
+# copied directory or symlink
+exts/amt.dtp.ise/amt/dtp/ise/lib
+exts/amt.dtp.ise/amt/dtp/ise/lib/
+
+exts/amt.dtp.ise/pip_prebundle/
+exts/amt.dtp.ise/coprocessor
+exts/amt.dtp.ise/coprocessor/
+exts/amt.dtp.ise/docs/
+
+# Copied from the repo root during a build
+exts/amt.dtp.ise/LICENSE.TXT
+exts/amt.dtp.ise/NOTICE
+exts/amt.dtp.ise/THIRD-PARTY-NOTICES.md

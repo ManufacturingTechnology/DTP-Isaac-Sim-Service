@@ -1,0 +1,19 @@
+# Claude Code: shared machinery (.claude/settings.json, skills/, hooks/) is committed;
+# only machine-local settings and per-session markers are ignored. The agent knowledge
+# base lives in docs/src/Agents/ (tracked). See AGENTS.md.
+.claude/settings.local.json
+# Local denylist for .github/scripts/check-content.py: the terms themselves are confidential.
+.claude/confidential-terms.txt
+.claude/.flush/
+.claude/docs/
+dist/
+
+# Python venvs, named per OS (ADR-0029); each subproject's .gitignore also keeps its pre-ADR-0029 names
+venv-linux/
+venv-windows/
+venv-linux-test/
+venv-windows-test/
+
+# Python bytecode caches (they embed the absolute path of the machine that compiled them)
+__pycache__/
+*.py[cod]

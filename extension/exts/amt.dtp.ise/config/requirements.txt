@@ -1,0 +1,2 @@
+# Only pure python packages (not c++ wrapper packages, etc.) can be loaded into pip_prebundle
+paho-mqtt==2.1.0
